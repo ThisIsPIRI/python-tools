@@ -1,5 +1,5 @@
 """
-A script to solve a statistics problem I found interesting a while back in school.
+A script to solve a statistics problem I found interesting a while back.
 Requires canBeMedianAfterInsert() function in statistics module. An implementation is available in statistics.py.
 """
 from statistics import canBeMedianAfterInsert

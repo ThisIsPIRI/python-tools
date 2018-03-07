@@ -1,6 +1,7 @@
-#A script to fix a weird error that arose after a Windows update
-#where many(but not all) entries in the start menu were duplicated.
-#For example, (icon) "Audacity" -> (no icon) "Audacity", (icon) "Audacity(1)"
+"""WORK IN PROGRESS.
+A script to fix a weird error that arose after a Windows update
+where many(but not all) entries in the start menu were duplicated.
+For example, (icon) Audacity -> (no icon) Audacity, (icon) Audacity (1)"""
 import os
 dir = os.path.dirname(os.path.abspath(__file__))
 files = os.listdir(dir)
