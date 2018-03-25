@@ -45,8 +45,8 @@ for index, videoId in enumerate(sys.argv[1:]): #Loop through all ids supplied fr
 		videoFile = getNextOf(b'Destination:', videoResult).decode("utf-8") #subprocess gives bytes by default. They have to be decoded into strings to be passed to subprocess.run().
 		audioFile = getNextOf(b'Destination:', audioResult).decode("utf-8")
 	except AttributeError: #Thrown if the destination filename wasn't found in one of the results.
-		print("Couldn't find the files")
-		exit()
+		print(f"Couldn't find the files for {index}th video. Proceeding to the next video.")
+		continue
 
 	#Use a temporary filename to prevent ffmpeg from overwriting the video it was reading.
 	subprocess.run(["ffmpeg", "-y", "-i", videoFile, "-i", audioFile, "-crf", "0", "-c:v", "copy", "-c:a", "aac", "-strict", "experimental", "dvnm_temp_output.mp4", "-hide_banner"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
