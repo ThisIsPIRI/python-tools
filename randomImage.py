@@ -1,6 +1,15 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import random
 import struct
+
+
+def writeImage(mat):
+	writeAs = 'c'
+	with open("test.ppm", 'wb') as f:
+		f.write(bytes(f"P6\n{len(mat)} {len(mat[0])}\n255\n", 'utf-8'))
+		for i in np.nditer(mat, order='C'):
+			f.write(struct.pack(writeAs, bytes([i])))
 
 
 def allRandom(width, height):
@@ -14,22 +23,33 @@ def allRandom(width, height):
 			f.write(struct.pack(format, bytes([random.randint(0, 255)])))
 
 
-def prevRandom(width, height, dotsDivisor=100):
+def prevRandom(width, height, vertical=False, zigzag=False, dotsDivisor=100):
 	"""Set dotsDivisor to a negative number or 0 to disable colors randomly switching throughout the image."""
-	format = 'c'
 	random.seed()
-	with open("test.ppm", 'wb') as f:
-		f.write(bytes(f"P6\n{width} {height}\n255\n", 'utf-8'))
-		prev = [None, None, None]
-		for i in range(width * height):
-			if (dotsDivisor > 0 and random.randrange(0, dotsDivisor) == 0) or prev[0] == None:
-				for i in range(3):
-					prev[i] = random.randint(0, 255)
-					f.write(struct.pack(format, bytes([prev[i]])))
+	
+	mainAxis = width if vertical else height
+	subAxis = height if vertical else width
+	mat = np.empty((mainAxis, subAxis, 3), dtype=np.uint8)
+	plt.ion()
+	plt.figure(1)
+	imgPlot = plt.imshow(mat)
+	for i in range(mainAxis):
+		goingReverse = zigzag and i % 2 == 1
+		r = reversed(range(subAxis)) if goingReverse else range(subAxis)
+		for j in r:
+			if (dotsDivisor > 0 and random.randrange(0, dotsDivisor) == 0) or (j == 0 and not zigzag):
+				for k in range(3):
+					mat[i,j,k] = random.randint(0, 255)
+			elif zigzag and (j == ((subAxis - 1) if goingReverse else 0)): # i will never be 0 if above if is False and zigzag is True
+				for k in range(3):
+					mat[i,j,k] = max(0, min(255, mat[i-1,j,k] + random.randint(-20, 20)))
 			else:
-				for i in range(3):
-					prev[i] = max(0, min(255, prev[i] + random.randint(-20, 20)))
-					f.write(struct.pack(format, bytes([prev[i]])))
+				for k in range(3):
+					mat[i,j,k] = max(0, min(255, mat[i,j+(1 if goingReverse else -1),k] + random.randint(-20, 20)))
+		imgPlot.set_data(mat)
+		plt.draw()
+		plt.pause(0.001)
+	writeImage(np.transpose(mat, (1, 0, 2)) if vertical else mat)
 					
 					
 def neighborRandom(width, height, dotsDivisor=100):
@@ -44,7 +64,6 @@ def neighborRandom(width, height, dotsDivisor=100):
 				if (dotsDivisor > 0 and random.randrange(0, dotsDivisor) == 0) or (i == 0 and j == 0):
 					for k in range(3):
 						mat[i,j,k] = random.randint(0, 255)
-						f.write(struct.pack(format, bytes([mat[i,j,k]])))
 				else:
 					base = None
 					if i == 0:
@@ -55,7 +74,7 @@ def neighborRandom(width, height, dotsDivisor=100):
 						base = [int(x / 2) for x in mat[i][j - 1] + mat[i - 1][j]]
 					for k in range(3):
 						mat[i,j,k] = max(0, min(255, base[k] + random.randint(-20, 20)))
-						f.write(struct.pack(format, bytes([mat[i,j,k]])))
+				f.write(struct.pack(format, bytes([mat[i,j]])))
 			
 
 def main():
@@ -64,7 +83,8 @@ def main():
 	if input("2d?(y/n): ") == 'y':
 		neighborRandom(width, height, divisor)
 	else:
-		prevRandom(width, height, divisor)
+		prevRandom(width, height, vertical=(input("vertical?(y/n): ") == 'y'), zigzag=(input("zigzag?(y/n): ") == 'y'), dotsDivisor=divisor)
+	input()
 			
 if __name__ == "__main__":
 	main()
