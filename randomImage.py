@@ -4,10 +4,10 @@ import random
 import struct
 
 
-def writeImage(mat):
+def writeImage(mat, width, height):
 	writeAs = 'c'
 	with open("test.ppm", 'wb') as f:
-		f.write(bytes(f"P6\n{len(mat)} {len(mat[0])}\n255\n", 'utf-8'))
+		f.write(bytes(f"P6\n{width} {height}\n255\n", 'utf-8'))
 		for i in np.nditer(mat, order='C'):
 			f.write(struct.pack(writeAs, bytes([i])))
 
@@ -23,16 +23,19 @@ def allRandom(width, height):
 			f.write(struct.pack(format, bytes([random.randint(0, 255)])))
 
 
-def prevRandom(width, height, vertical=False, zigzag=False, dotsDivisor=100):
+def prevRandom(width, height, vertical=False, zigzag=False, dotsDivisor=100, showProcess=True):
 	"""Set dotsDivisor to a negative number or 0 to disable colors randomly switching throughout the image."""
 	random.seed()
 	
 	mainAxis = width if vertical else height
 	subAxis = height if vertical else width
 	mat = np.empty((mainAxis, subAxis, 3), dtype=np.uint8)
-	plt.ion()
-	plt.figure(1)
-	imgPlot = plt.imshow(mat)
+	
+	if showProcess:
+		plt.ion()
+		plt.figure(1)
+		imgPlot = plt.imshow(mat)
+		
 	for i in range(mainAxis):
 		goingReverse = zigzag and i % 2 == 1
 		r = reversed(range(subAxis)) if goingReverse else range(subAxis)
@@ -46,10 +49,15 @@ def prevRandom(width, height, vertical=False, zigzag=False, dotsDivisor=100):
 			else:
 				for k in range(3):
 					mat[i,j,k] = max(0, min(255, mat[i,j+(1 if goingReverse else -1),k] + random.randint(-20, 20)))
-		imgPlot.set_data(mat)
-		plt.draw()
-		plt.pause(0.001)
-	writeImage(np.transpose(mat, (1, 0, 2)) if vertical else mat)
+					
+		if showProcess:
+			imgPlot.set_data(mat)
+			plt.draw()
+			plt.pause(0.001)
+
+	writeImage(np.transpose(mat, (1, 0, 2)) if vertical else mat, width, height)
+	if showProcess:
+		plt.close()
 					
 					
 def neighborRandom(width, height, dotsDivisor=100):
@@ -83,8 +91,9 @@ def main():
 	if input("2d?(y/n): ") == 'y':
 		neighborRandom(width, height, divisor)
 	else:
-		prevRandom(width, height, vertical=(input("vertical?(y/n): ") == 'y'), zigzag=(input("zigzag?(y/n): ") == 'y'), dotsDivisor=divisor)
-	input()
+		prevRandom(width, height, vertical=(input("vertical?(y/n): ") == 'y'),
+			zigzag=(input("zigzag?(y/n): ") == 'y'),
+			dotsDivisor=divisor, showProcess=(input("show process?(y/n): ") == 'y'))
 			
 if __name__ == "__main__":
 	main()
