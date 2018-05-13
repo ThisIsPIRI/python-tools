@@ -83,7 +83,8 @@ def neighborRandom(width, height, dotsDivisor=100):
 				elif j == 0:
 					base = mat[i - 1][j]
 				else:
-					base = [int(x / 2) for x in mat[i][j - 1] + mat[i - 1][j]]
+					base = ((mat[i][j - 1] + mat[i - 1][j]) / 2).astype(np.int32) # Slightly faster than list comprehension.
+				# TODO: fix dots appearing even when disabled
 				for k in range(3):
 					mat[i,j,k] = max(0, min(255, base[k] + random.randint(-20, 20)))			
 	return mat
@@ -98,6 +99,7 @@ def main():
 		writeImage(prevRandom(width, height, vertical=(input("vertical?(y/n): ") == 'y'),
 			zigzag=(input("zigzag?(y/n): ") == 'y'),
 			dotsDivisor=divisor, showProcess=(input("show process?(y/n): ") == 'y')), width, height)
-			
+
+
 if __name__ == "__main__":
 	main()
