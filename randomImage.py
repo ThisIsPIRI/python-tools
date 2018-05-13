@@ -24,7 +24,12 @@ def allRandom(width, height):
 
 
 def prevRandom(width, height, vertical=False, zigzag=False, dotsDivisor=100, showProcess=True):
-	"""Set dotsDivisor to a negative number or 0 to disable colors randomly switching throughout the image."""
+	"""Returns an np.ndarray of dimension (height, width, 3) representing an image of lines on which randomly and smoothly changing colors appear.
+	vertical -- Whether to draw vertical lines instead of horizontal ones.
+	zigzag -- Whether to continue the initial line in zigzag instead of making a new one for every row of pixels.
+	dotsDivisor -- n in 1/n, the probability of a completely new color(dot) spawning instead of a slight diversion from the last one.
+	Will disable dots if less than or equal to 0.
+	showProcess -- Whether to show the process live through pyplot."""
 	random.seed()
 	
 	mainAxis = width if vertical else height
@@ -55,45 +60,44 @@ def prevRandom(width, height, vertical=False, zigzag=False, dotsDivisor=100, sho
 			plt.draw()
 			plt.pause(0.001)
 
-	writeImage(np.transpose(mat, (1, 0, 2)) if vertical else mat, width, height)
 	if showProcess:
 		plt.close()
-					
-					
+	return np.transpose(mat, (1, 0, 2)) if vertical else mat
+
+
 def neighborRandom(width, height, dotsDivisor=100):
 	"""Set dotsDivisor to a negative number or 0 to disable random dots appearing throughout the image."""
 	format = 'c'
 	random.seed()
-	with open("test.ppm", 'wb') as f:
-		f.write(bytes(f"P6\n{width} {height}\n255\n", 'utf-8'))
-		mat = np.empty((height, width, 3), dtype=np.uint8)
-		for i in range(height):
-			for j in range(width):
-				if (dotsDivisor > 0 and random.randrange(0, dotsDivisor) == 0) or (i == 0 and j == 0):
-					for k in range(3):
-						mat[i,j,k] = random.randint(0, 255)
+	mat = np.empty((height, width, 3), dtype=np.uint8)
+	
+	for i in range(height):
+		for j in range(width):
+			if (dotsDivisor > 0 and random.randrange(0, dotsDivisor) == 0) or (i == 0 and j == 0):
+				for k in range(3):
+					mat[i,j,k] = random.randint(0, 255)
+			else:
+				base = None
+				if i == 0:
+					base = mat[i][j - 1]
+				elif j == 0:
+					base = mat[i - 1][j]
 				else:
-					base = None
-					if i == 0:
-						base = mat[i][j - 1]
-					elif j == 0:
-						base = mat[i - 1][j]
-					else:
-						base = [int(x / 2) for x in mat[i][j - 1] + mat[i - 1][j]]
-					for k in range(3):
-						mat[i,j,k] = max(0, min(255, base[k] + random.randint(-20, 20)))
-				f.write(struct.pack(format, bytes([mat[i,j]])))
-			
+					base = [int(x / 2) for x in mat[i][j - 1] + mat[i - 1][j]]
+				for k in range(3):
+					mat[i,j,k] = max(0, min(255, base[k] + random.randint(-20, 20)))			
+	return mat
+
 
 def main():
 	width, height = [int(x) for x in input("Width and height(separated by a space): ").split()]
 	divisor = 100 if input("dots?(y/n): ") == 'y' else -1
 	if input("2d?(y/n): ") == 'y':
-		neighborRandom(width, height, divisor)
+		writeImage(neighborRandom(width, height, divisor), width, height)
 	else:
-		prevRandom(width, height, vertical=(input("vertical?(y/n): ") == 'y'),
+		writeImage(prevRandom(width, height, vertical=(input("vertical?(y/n): ") == 'y'),
 			zigzag=(input("zigzag?(y/n): ") == 'y'),
-			dotsDivisor=divisor, showProcess=(input("show process?(y/n): ") == 'y'))
+			dotsDivisor=divisor, showProcess=(input("show process?(y/n): ") == 'y')), width, height)
 			
 if __name__ == "__main__":
 	main()
