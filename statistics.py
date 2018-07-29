@@ -11,7 +11,10 @@ def canBeMedianAfterInsert(data, toBeMedian, toBeInserted):
 		(data[halfLen - 1] <= toBeInserted <= data[halfLen + 1] and (data[halfLen] + toBeInserted) / 2 == toBeMedian)):
 			return True
 	return False
+
+
 def mode(data):
+	"""Returns the mode(s) of data."""
 	num = []; freq = [1]
 	recorder = 0; maxFreq = 0
 	def checkMax():
@@ -29,4 +32,3 @@ def mode(data):
 		freq[recorder] += 1
 	checkMax()
 	return num
-

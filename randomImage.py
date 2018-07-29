@@ -13,7 +13,7 @@ def writeImage(mat, width, height):
 
 
 def allRandom(width, height):
-	format = 'c' #use 'i' to repeat one R, one G, one B column and one empty column
+	format = 'c' #set to 'i' to repeat one R, one G, one B column and one empty column
 	random.seed()
 	with open("test.ppm", 'wb') as f:
 		f.write(bytes(f"P6\n{width} {height}\n255\n", 'utf-8'))
@@ -66,7 +66,8 @@ def prevRandom(width, height, vertical=False, zigzag=False, dotsDivisor=100, sho
 
 
 def neighborRandom(width, height, dotsDivisor=100):
-	"""Set dotsDivisor to a negative number or 0 to disable random dots appearing throughout the image."""
+	"""Returns an np.ndarray of dimension (height, width, 3) representing an image with pastel-like textures and colors.
+	Set dotsDivisor to a negative number or 0 to disable random dots appearing throughout the image."""
 	format = 'c'
 	random.seed()
 	mat = np.empty((height, width, 3), dtype=np.uint8)
@@ -84,7 +85,7 @@ def neighborRandom(width, height, dotsDivisor=100):
 					base = mat[i - 1][j]
 				else:
 					base = ((mat[i][j - 1] + mat[i - 1][j]) / 2).astype(np.int32) # Slightly faster than list comprehension.
-				# TODO: fix dots appearing even when disabled
+				# TODO: fix a small number of dots appearing even when disabled
 				for k in range(3):
 					mat[i,j,k] = max(0, min(255, base[k] + random.randint(-20, 20)))			
 	return mat
