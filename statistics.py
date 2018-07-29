@@ -13,22 +13,27 @@ def canBeMedianAfterInsert(data, toBeMedian, toBeInserted):
 	return False
 
 
-def mode(data):
-	"""Returns the mode(s) of data."""
-	num = []; freq = [1]
-	recorder = 0; maxFreq = 0
-	def checkMax():
-		if maxFreq < freq[recorder]:
-			num.clear()
-			maxFreq = freq[recorder]
-			num.append(data[i - 1])
-		elif maxFreq == freq[recorder]:
-			num.append(data[i - 1])
-	for i in range(1, len(data)):
-		if data[i] != data[i - 1]:
-			checkMax()
-			recorder += 1
-			freq.append(0)
-		freq[recorder] += 1
-	checkMax()
-	return num
+def mode(data, isSorted=False):
+	"""Returns the mode(s) of data. Set sorted to True if data is sorted. The order doesn't matter."""
+	result = []; maxFreq = 0; freq = 0; lastNum = None
+	if not isSorted: data = sorted(data)
+	
+	for num in data:
+		if num != lastNum:
+			if freq > maxFreq:
+				result.clear()
+			if freq >= maxFreq:
+				result.append(lastNum)
+				maxFreq = freq
+			freq = 0
+			lastNum = num
+		freq += 1
+
+	lastNum = data[len(data) - 1]
+	# TODO: make this a function
+	if freq > maxFreq:
+		result.clear()
+	if freq >= maxFreq:
+		result.append(lastNum)
+		maxFreq = freq
+	return result
