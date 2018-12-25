@@ -1,7 +1,7 @@
 # PIRI Python Tools
 
 ## dvnm.py
-Downloads videos from Youtube at the best quality with youtube-dl and ffmpeg.
+(Obsolete) Downloads videos from Youtube at the best quality with youtube-dl and ffmpeg.
 
 ## getapk.py
 Gets the apk for an app from ADB. (not functional)

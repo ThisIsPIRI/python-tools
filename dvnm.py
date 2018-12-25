@@ -1,4 +1,5 @@
 """
+Update: As of 2018-12-25 this script is obsolete. youtube-dl seems to have been updated to handle this itself.
 The "best" quality youtube-dl automatically downloads videos at might not actually be the best: Youtube usually doesn't provide FHD videos with audio.
 Thus, youtube-dl downloads the "best" format that contains both the video and audio by default, which is not the best in most cases.
 To download videos at the true best quality, we have to download the video AND audio in most cases("youtube-dl -f bestvideo" and "youtube-dl -f bestaudio")
@@ -70,7 +71,7 @@ for index, videoId in enumerate(sys.argv[idStart:]): #Loop through all ids suppl
 		print(f"Couldn't find the files for {index}th video. Proceeding to the next video.")
 		continue
 
-	subprocess.run(["ffmpeg", "-y", "-i", videoFile, "-i", audioFile, "-crf", "0", "-c:v", "copy", "-c:a", "aac", "-strict", "experimental", f"{videoId}.mp4", "-hide_banner"] + moreArgs["-ff"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+	subprocess.run(["ffmpeg", "-y", "-i", videoFile, "-i", audioFile, "-crf", "0", "-c", "copy", "-strict", "experimental", f"{videoId}.mp4", "-hide_banner"] + moreArgs["-ff"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 	print("Completed merging the two")
 	os.remove(videoFile)
 	os.remove(audioFile)
