@@ -1,5 +1,11 @@
 # PIRI Python Tools
 
+## capture.py
+Captures screenshots of a window with GDK and converts them to numpy arrays.
+
+## downloadPage.py
+Downloads a webpage from URL. May be able to download other files.
+
 ## dvnm.py
 (Obsolete) Downloads videos from Youtube at the best quality with youtube-dl and ffmpeg.
 
