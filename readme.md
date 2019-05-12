@@ -3,6 +3,9 @@
 ## capture.py
 Captures screenshots of a window with GDK and converts them to numpy arrays.
 
+## cutaud
+Mutes multiple sections of a video.
+
 ## downloadPage.py
 Downloads a webpage from URL. May be able to download other files.
 
