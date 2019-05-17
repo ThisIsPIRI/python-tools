@@ -17,8 +17,7 @@ def pixbuf_to_array(pixbuf):
 	return np.frombuffer(pixbuf.get_pixels(), dtype=np.uint8).reshape(pixbuf.get_height(), pixbuf.get_width(), pixbuf.get_n_channels())
 
 def get_pixbuf(window):
-	pb = Gdk.pixbuf_get_from_window(window, *window.get_geometry())
-	return pb
+	return Gdk.pixbuf_get_from_window(window, *window.get_geometry())
 
 def get_active_window():
 	return Gdk.get_default_root_window().get_screen().get_active_window()
@@ -36,9 +35,10 @@ def repeat(func, interval, *args, **kwargs):
 	def repeat_decorator(func):
 		@functools.wraps(func)
 		def wrapper(*args, **kwargs):
+			started = time.time()
 			stopped = func(*args, **kwargs)
 			if not stopped:
-				scheduler.enter(interval, 1, wrapper, args, kwargs)
+				scheduler.enter(interval - (time.time() - started), 1, wrapper, args, kwargs)
 		return wrapper
 	scheduler.enter(interval, 1, repeat_decorator(func), args, kwargs)
 	scheduler.run()
