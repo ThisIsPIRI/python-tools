@@ -3,14 +3,12 @@ import matplotlib.pyplot as plt
 import random
 import struct
 
-
 def writeImage(mat, width, height):
 	writeAs = 'c'
 	with open("test.ppm", 'wb') as f:
 		f.write(bytes(f"P6\n{width} {height}\n255\n", 'utf-8'))
 		for i in np.nditer(mat, order='C'):
 			f.write(struct.pack(writeAs, bytes([i])))
-
 
 def allRandom(width, height):
 	format = 'c' #set to 'i' to repeat one R, one G, one B column and one empty column
@@ -21,7 +19,6 @@ def allRandom(width, height):
 			f.write(struct.pack(format, bytes([random.randint(0, 255)])))
 			f.write(struct.pack(format, bytes([random.randint(0, 255)])))
 			f.write(struct.pack(format, bytes([random.randint(0, 255)])))
-
 
 def prevRandom(width, height, vertical=False, zigzag=False, dotsDivisor=100, showProcess=True):
 	"""Returns an np.ndarray of dimension (height, width, 3) representing an image of lines on which randomly and smoothly changing colors appear.
@@ -64,7 +61,6 @@ def prevRandom(width, height, vertical=False, zigzag=False, dotsDivisor=100, sho
 		plt.close()
 	return np.transpose(mat, (1, 0, 2)) if vertical else mat
 
-
 def neighborRandom(width, height, dotsDivisor=100):
 	"""Returns an np.ndarray of dimension (height, width, 3) representing an image with pastel-like textures and colors.
 	Set dotsDivisor to a negative number or 0 to disable random dots appearing throughout the image."""
@@ -90,7 +86,6 @@ def neighborRandom(width, height, dotsDivisor=100):
 					mat[i,j,k] = max(0, min(255, base[k] + random.randint(-20, 20)))			
 	return mat
 
-
 def main():
 	width, height = [int(x) for x in input("Width and height(separated by a space): ").split()]
 	divisor = 100 if input("dots?(y/n): ") == 'y' else -1
@@ -100,7 +95,6 @@ def main():
 		writeImage(prevRandom(width, height, vertical=(input("vertical?(y/n): ") == 'y'),
 			zigzag=(input("zigzag?(y/n): ") == 'y'),
 			dotsDivisor=divisor, showProcess=(input("show process?(y/n): ") == 'y')), width, height)
-
 
 if __name__ == "__main__":
 	main()
