@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#Inserts spaces between all characters in argvand outputs the result.
+#Inserts spaces between all characters in argv and outputs the result.
 
 def spaceout(s):
 	add = 0

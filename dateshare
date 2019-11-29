@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+import os
+from sys import argv
+if len(argv) <= 1:
+	argv.append(os.getcwd())
+elif argv[1] == "--help" or argv[1] == "-h":
+	print("사진을 어떤 날에 얼마나 찍었는지 보여줍니다.")
+	print("파일이름의 첫 8자리가 YYYYMMDD여야 합니다.")
+	print("첫째 인수로 폴더이름을 넘기면 CWD가 아닌 그 폴더에 있는 사진을 셉니다.")
+	exit()
+shares = {}
+for f in [lf for lf in os.listdir(argv[1]) if os.path.isfile(os.path.join(argv[1], lf))]:
+	try:
+		shares[f[0:8]] += 1
+	except KeyError:
+		shares[f[0:8]] = 1
+shares = sorted(shares.items(), key=lambda kv: kv[1], reverse=True)
+for i in shares:
+	print(i)
