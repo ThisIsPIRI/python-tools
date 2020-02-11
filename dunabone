@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+import numpy as np
+import matplotlib.pyplot as plt
+import random
+import struct
+import sys
+import time
+
+def setmat(mat, num): #TODO: Optimize later
+	height, width = mat.shape
+	binstring = bin(num)[2:]
+	power = len(binstring)
+	gap = width * height - power
+	print(binstring)
+	istart = height + (-power // width) #https://stackoverflow.com/a/35125872
+	for i in range(istart, height):
+		for j in range(width - power % width if i == istart and power % width != 0 else 0, width):
+			curVal = int(binstring[i * width + j - gap])
+			if curVal != mat[i,j]:
+				mat[i,j] = curVal
+
+def baim(width, height, maxdelta, sleeptime, startnum):
+	random.seed()
+	maxnum = 2 ** (width * height) - 1
+	num = startnum if startnum >= 0 else int(maxnum - random.randrange(1, maxnum))
+	mat = np.zeros((height, width), dtype=np.uint8)
+	print(f"Starting value: {num}")
+
+	plt.ion()
+	plt.figure(1)
+	imgPlot = plt.imshow(mat, cmap="Greys", vmin=0, vmax=1)
+
+	while num < maxnum:
+		setmat(mat, num)
+		num += random.randrange(1, maxdelta);
+		imgPlot.set_data(mat)
+		plt.draw()
+		plt.pause(0.001)
+		time.sleep(sleeptime)
+
+	plt.close()
+	return mat
+
+def main(): #TODO: optional arguments
+	"""
+	Usage: dunabone width height maxdeltaperframe timebetweenframesinseconds startnum
+	Supply a negative number to startnum for a random starting number.
+	Suggested parameters: 20 1 1 1 1, 10 10 10000000000000 0 -1, 3 3 2 0 0
+	"""
+	baim(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]) + 1, int(sys.argv[4]), int(sys.argv[5]))
+
+if __name__ == "__main__":
+	main()

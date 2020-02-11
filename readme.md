@@ -12,6 +12,10 @@ Mutes multiple sections of a video.
 하루에 사진을 얼마나 찍었는지 보여줍니다.
 Shows how many photos were taken in each day.
 
+## dunabone
+두나(이진법)를 그림으로 보여줍니다. 무작위 검정하양(흑백) 그림을 만들어내는 데 쓸 수도 있습니다.
+Illustrates how binary works. Can also be used to generate random black-and-white images.
+
 ## dvnm.py
 (Obsolete) Downloads videos from Youtube at the best quality with youtube-dl and ffmpeg.
 
