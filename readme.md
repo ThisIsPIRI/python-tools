@@ -12,7 +12,7 @@ Mutes multiple sections of a video.
 하루에 사진을 얼마나 찍었는지 보여줍니다.
 Shows how many photos were taken in each day.
 
-## dunabone
+## dunabone 두나본
 두나(이진법)를 그림으로 보여줍니다. 무작위 검정하양(흑백) 그림을 만들어내는 데 쓸 수도 있습니다.
 Illustrates how binary works. Can also be used to generate random black-and-white images.
 
@@ -29,6 +29,10 @@ Downsizes and moves many images at once.
 ## merge_data.py
 아랫폴더에서 윗폴더로 파일을 옮깁니다.
 Moves all files in all subdirectories to their parent directory.
+
+## nurijach 누리자취
+traceroute를 돌려서 나온 IP의 땅위자리(좌표)를 kml에 씁니다.
+Writes geolocations of IPs from traceroute to kml.
 
 ## randomImage.py
 무작위로 무지갯빛 그림을 만들어냅니다.

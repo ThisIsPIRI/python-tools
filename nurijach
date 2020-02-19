@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+
+"""누리자취
+./nurijach example.com filename.kml
+traceroute를 돌려서 나온 IP의 땅위자리(좌표)를 kml에 씁니다.
+파일이름이 주어지지 않으면 <주소>.kml에 씁니다.
+쓰기 앞서 API_ADDR를 바꾸거나 https://ip-api.com/docs/legal을 읽으세요
+Change API_ADDR or read https://ip-api.com/docs/legal before using"""
+import json
+import re
+import urllib.request as request
+from ipaddress import ip_address
+from subprocess import run
+from sys import argv
+
+API_ADDR = "http://ip-api.com/json/{}"
+KML_OPENING = """<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+	<Placemark>
+		<LineString>
+			<tessellate>1</tessellate>
+			<coordinates>
+				"""
+KML_CLOSING = """
+			</coordinates>
+		</LineString>
+	</Placemark>
+</Document>
+</kml>"""
+
+if len(argv) < 3:
+	argv.append(argv[1] + ".kml")
+
+output = run(["traceroute", argv[1]], capture_output=True)
+
+ips = []
+for i in output.stdout.split(b'\n')[1:]: #첫째 줄을 버림
+	try:
+		content = re.search('\(([^)]+)', str(i)).group(1)
+	except AttributeError: #줄에 IP가 없으면
+		continue
+	if ip_address(content).is_private: #192, 172...
+		continue
+	ips.append(content)
+
+with open(argv[2], 'w') as kmlfile:
+	kmlfile.write(KML_OPENING)
+	for ip in ips:
+		res = json.loads(request.urlopen(API_ADDR.format(ip)).read())
+		lat = res["lat"]; lon = res["lon"]; city = res["city"]; country = res["country"]
+		print(f"{ip} at ({lat}, {lon}) in {city}, {country}")
+		kmlfile.write(f"{lon},{lat},0 ")
+	kmlfile.write(KML_CLOSING)
