@@ -42,9 +42,11 @@ def prevRandom(width, height, vertical=False, zigzag=False, dotsDivisor=100, sho
 		goingReverse = zigzag and i % 2 == 1
 		r = reversed(range(subAxis)) if goingReverse else range(subAxis)
 		for j in r:
+			#Use a completely new color on dotsDivisor hit or a non-zigzag line start
 			if (dotsDivisor > 0 and random.randrange(0, dotsDivisor) == 0) or (j == 0 and not zigzag):
 				for k in range(3):
 					mat[i,j,k] = random.randint(0, 255)
+			#Use the color one pixel above at new zigzag line start
 			elif zigzag and (j == ((subAxis - 1) if goingReverse else 0)): # i will never be 0 if above if is False and zigzag is True
 				for k in range(3):
 					mat[i,j,k] = max(0, min(255, mat[i-1,j,k] + random.randint(-20, 20)))
