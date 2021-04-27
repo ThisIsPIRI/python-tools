@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-#두나본
 import numpy as np
 import matplotlib.pyplot as plt
 import random
@@ -45,7 +44,7 @@ def baim(width, height, maxdelta, sleeptime, startnum):
 
 def main(): #TODO: optional arguments
 	"""
-	Usage: dunabone width height maxdeltaperframe timebetweenframesinseconds startnum
+	Usage: dunaol width height maxdeltaperframe timebetweenframesinseconds startnum
 	Supply a negative number to startnum for a random starting number.
 	Suggested parameters: 20 1 1 1 1, 10 10 10000000000000 0 -1, 3 3 2 0 0
 	"""
