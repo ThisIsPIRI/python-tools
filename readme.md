@@ -16,12 +16,6 @@ Shows how many photos were taken in each day.
 두나올(이진법)을 그림으로 보여줍니다. 검정하양(흑백) 막(무작위)그림을 만드는 데 쓸 수도 있습니다.
 Illustrates how binary works. Can also be used to generate random black-and-white images.
 
-## dvnm.py
-(Obsolete) Downloads videos from Youtube at the best quality with youtube-dl and ffmpeg.
-
-## getapk.py
-Gets the apk for an app from ADB. (not functional)
-
 ## image_downsizer.py
 그림을 줄여서 옮깁니다.
 Downsizes and moves many images at once.
@@ -41,6 +35,26 @@ Creates beautiful random images.
 ## renameSeq.py
 파일이름을 모두 셀글(숫자)로 바꿉니다.
 Renames a sequence of files so they all have integers as names.
+
+## sirxegier
+Sirxegier(섞새겨) is a barebones commandline music player script for one specific purpose: **shuffle** all audio files under a directory, and **remember** the shuffled order. Written because out of 4 music players I tried, 1 didn't have this functionality, 1 kept hanging after each file and 2 tried to scan my entire home folder without any prompts.
+
+Features:
+
+- Shuffle all audio files from one or more directories into one list.
+- Play files from that list(using mpv).
+- Remember the shuffled order and current track.
+- No changes to any directory except the one sirxegier's run in.
+
+Does **not** feature:
+
+- Playlists.
+- Reading or fetching metadata.
+- Remembering the current second within a file.
+
+Dependency: mpv in a Path.
+
+Might have some encoding issues on Windows.
 
 ## spaceout
 글 씨 사 이 에 빈 자 리 를 넣 습 니 다 .

@@ -1,0 +1,247 @@
+#!/usr/bin/env python3
+
+import json
+import os
+import random
+import subprocess
+
+class LibDir:
+	def __init__(self, root):
+		self.root = root
+		self.files = []
+	def __str__(self):
+		if len(self.files) <= 0:
+			return f"root: {self.root}, no files"
+		else:
+			return f"root: {self.root}, files: {len(self.files)} files including {self.files[0]}"
+	def __repr__(self):
+		return str(self)
+
+def find_songs(paths, audio_exts):
+	result = []
+	idx = -1
+	for origp in paths:
+		p = os.path.join(origp, "") #Add a trailing slash if there isn't one
+		result.append(LibDir(p))
+		idx += 1
+		for wr in os.walk(p):
+			audio_only = filter(lambda x: x.endswith(audio_exts), wr[2])
+			underroot = [os.path.join(wr[0], fn).replace(p, "") for fn in audio_only]
+			result[idx].files.extend(underroot)
+	return result
+
+def write_library(library, filename):
+	with open(filename, "w") as wf:
+		for ld in library:
+			if len(ld.root) > 0:
+				wf.write(f"////++++++{ld.root}++++++////\n")
+			for f in ld.files:
+				wf.write(f)
+				wf.write('\n')
+			wf.write('\n')
+
+def read_library(filename):
+	try:
+		with open(filename) as rf:
+			lines = rf.readlines()
+	except FileNotFoundError:
+		return []
+	result = []
+	idx = -1
+	for l in lines:
+		if l[:10] == "////++++++" and l[-11:-1] == "++++++////":
+			result.append(LibDir(l[10:-11]))
+			idx += 1
+		elif len(l) > 1:
+			if len(result) <= 0:
+				result.append(LibDir(""))
+				idx += 1
+			result[idx].files.append(l[:-1])
+	return result
+
+def write_options(options, filename):
+	with open(filename, "w") as wf:
+		json.dump(options, wf)
+
+def read_options(filename):
+	try:
+		with open(filename) as rf:
+			return json.load(rf)
+	except FileNotFoundError:
+		return dict()
+
+def gen_shuffle(library, seed):
+	nums = []
+	for i, ld in enumerate(library):
+		nums.extend([(i, fnum) for fnum in range(len(ld.files))])
+	random.seed(seed)
+	random.shuffle(nums)
+	return nums
+
+def play_file(fp, print_full=False):
+	PLAYER_COMMAND = ["mpv", "--msg-level=all=no,statusline=status", "--no-audio-display", fp]
+	print(fp if print_full else os.path.basename(fp))
+	subprocess.run(PLAYER_COMMAND)
+
+###################
+
+from sys import argv
+import signal
+import time
+
+PROGRAM_NAME = "sirxegier"
+LIBRARY_FILENAME = "{0}-library".format(PROGRAM_NAME)
+OPTIONS_FILENAME = "{0}-options".format(PROGRAM_NAME)
+AUDIO_FILE_EXTENSIONS = frozenset({".ogg", ".flac", ".wav", ".mp3", ".m4a", ".webm"})
+
+HELP_STRINGS = {
+"base": """Usage: '{0} <command> <command args>'
+Commands: help play update set
+Running without any command is the same as running with the play command.""".format(PROGRAM_NAME),
+"play": """Usage: '{0}' or '{0} play'
+Plays audio files from the library.""".format(PROGRAM_NAME),
+"update": """Usage: '{0} update <path>'
+Overwrites {0}'s current file index with audio files under <path>.
+Multiple paths can be given, separated by spaces.
+This command will not change anything about your actual audio files. It only locates them so {0} can play them.""".format(PROGRAM_NAME),
+"help": """Usage: '{0} help <command>'
+Prints help about <command>. Multiple commands can be given, separated by spaces.
+If no command is given, prints the list of possible commands.""".format(PROGRAM_NAME),
+"set": """Usage: '{0} set <option name>=<option value>'
+Sets option value(s). Multiple name-value pairs can be given, separated by spaces.
+Leave the value empty to reset the option to its default value.
+Supported options:
+'autoshuffle': Shuffle and start again without prompting at the end of the list.
+'print_full': Print the full path when playing a file.
+'add_extension': Add or remove recognized file extensions. Examples: '+.audio', '+.add,-.mp3,+.addmore'
+Setting this to a single '+' will make {0} index all files regardless of the extension.""".format(PROGRAM_NAME)
+}
+
+OUTPUT_STRINGS = {
+"command_not_found": "{0}: sirxegier command not found",
+"overwrite_warning": "This will overwrite the current file index. Are you sure?: ",
+"opt_format_warning": "Option '{0}' does not follow the 'key=value' format",
+"opt_non_editable_warning": "Option '{0}' should not be set manually",
+"finding_songs": "Finding audio files from:",
+"no_path_given": "Did nothing as no path was given. Please see '{0} help update'.".format(PROGRAM_NAME),
+"end_list_prompt": "Reached the end of list. Shuffle and start again?: ",
+"interrupt_exiting": "{0}: interrupt received. Exiting..".format(PROGRAM_NAME),
+"library_empty": "The library is empty. Please run '{0} update' first.".format(PROGRAM_NAME)
+}
+
+YES_STRINGS = frozenset({
+"예", "네", "응", "어", "y", "yes", "yeah", "sure", "はい", "ええ", "うん", "是", "sí", "ja", "да", "true"
+})
+
+NON_EDITABLE_OPTIONS = frozenset({
+"seed", "cur_track"
+})
+
+BOOLEAN_OPTIONS = frozenset({
+"autoshuffle", "print_full"
+})
+
+def check_yes(s):
+	return s.lower() in YES_STRINGS
+
+def prompt(question):
+	ans = input(question)
+	return check_yes(ans)
+
+def print_help(commands=()):
+	if len(commands) == 0:
+		print(HELP_STRINGS["base"])
+	else:
+		for c in commands:
+			try:
+				print(HELP_STRINGS[c])
+			except KeyError:
+				print(OUTPUT_STRINGS["command_not_found"].format(c))
+
+def update_library(paths, filename, opt_filename):
+	if len(paths) <= 0:
+		print(OUTPUT_STRINGS["no_path_given"])
+		return
+	print(OUTPUT_STRINGS["finding_songs"])
+	for p in paths:
+		print(p)
+	if not prompt(OUTPUT_STRINGS["overwrite_warning"]):
+		return
+
+	options = read_options(opt_filename)
+	exts = set(AUDIO_FILE_EXTENSIONS)
+	if "add_extension" in options:
+		for e in options["add_extension"].split(','):
+			if len(e) <= 0:
+				continue
+			elif e[0] == '+':
+				exts.add(e[1:])
+			elif e[0] == '-':
+				exts.discard(e[1:])
+	write_library(find_songs(paths, tuple(exts)), filename)
+
+	options.pop("seed", None)
+	options.pop("cur_track", None)
+	write_options(options, opt_filename)
+
+def set_options(pairs, filename):
+	options = read_options(filename)
+	for p in pairs:
+		if p.startswith('=') or '=' not in p:
+			print(OUTPUT_STRINGS["opt_format_warning"].format(p))
+		else:
+			sp = p.split('=')
+			if sp[0] in NON_EDITABLE_OPTIONS:
+				print(OUTPUT_STRINGS["opt_non_editable_warning"].format(sp[0]))
+			else:
+				if len(sp[1]) <= 0:
+					options.pop(sp[0], None) #Remove the key
+				elif sp[0] in BOOLEAN_OPTIONS:
+					options[sp[0]] = check_yes(sp[1])
+				else:
+					options[sp[0]] = sp[1]
+	write_options(options, filename)
+
+def play(library, options, opt_filename):
+	if all([len(x.files) <= 0 for x in library]):
+		print(OUTPUT_STRINGS["library_empty"])
+		return
+	try:
+		if "seed" not in options:
+			options["seed"] = time.time_ns()
+			write_options(options, opt_filename)
+
+		seq = gen_shuffle(library, options["seed"])
+		last_track = options.get("cur_track", 0)
+		for i in range(last_track, len(seq)):
+			options["cur_track"] = i
+			write_options(options, opt_filename)
+			curlib = library[seq[i][0]]
+			full_path = os.path.join(curlib.root, curlib.files[seq[i][1]])
+			play_file(full_path, options.get("print_full", False))
+
+		#End of list.
+		options["cur_track"] = len(seq)
+		write_options(options, opt_filename)
+		if options.get("autoshuffle", False) or prompt(OUTPUT_STRINGS["end_list_prompt"]):
+			options["seed"] = time.time_ns()
+			options["cur_track"] = 0
+			write_options(options, opt_filename)
+			play(library, options, opt_filename)
+
+	except KeyboardInterrupt:
+		print(OUTPUT_STRINGS["interrupt_exiting"])
+		write_options(options, opt_filename)
+
+if __name__ == "__main__":
+	signal.signal(signal.SIGINT, signal.default_int_handler)
+	if len(argv) <= 1 or argv[1] == "play":
+		play(read_library(LIBRARY_FILENAME), read_options(OPTIONS_FILENAME), OPTIONS_FILENAME)
+	elif argv[1] == "help":
+		print_help(argv[2:])
+	elif argv[1] == "update":
+		update_library(argv[2:], LIBRARY_FILENAME, OPTIONS_FILENAME)
+	elif argv[1] == "set":
+		set_options(argv[2:], OPTIONS_FILENAME)
+	else:
+		print_help()

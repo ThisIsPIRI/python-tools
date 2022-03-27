@@ -2,7 +2,7 @@
 
 귀띔 = """모아쓴 한글을 풀어씁니다.
 풀라 <글>: <글>을 풀어씁니다.
-풀라 ㄸ: 다금들이(stdin)에서 읽은 글을 풀어씁니다.
+풀라 ㄸ: 대중들이(stdin)에서 읽은 글을 풀어씁니다.
 풀라 ㅇ <아롬(파일)이름>: <아롬이름>에서 읽은 글을 풀어씁니다."""
 
 첫소리들 = {
@@ -136,7 +136,7 @@
 
 
 from sys import argv as 줄넘김
-from sys import stdin as 다금들이
+from sys import stdin as 대중들이
 from sys import exit as 나가라
 두루째 = ord
 길이 = len
@@ -170,7 +170,7 @@ def 어귀탐():
 		with 열라(줄넘김[2]) as 아롬:
 			밑글 = 아롬.read()
 	elif 줄넘김[1] == 'ㄸ':
-		밑글 = 다금들이.read()
+		밑글 = 대중들이.read()
 	else:
 		밑글 = 줄넘김[1]
 		줄넘김서받았다 = 참
