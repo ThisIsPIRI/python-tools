@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+
+import os
+from sys import argv
+
+def eligible(name):
+	# EDIT ME
+	# Determine whether a file should be renamed.
+	return False
+
+def process(name):
+	# EDIT ME
+	# Return the new name given an old name.
+	return name
+
+# TODO: guard against overwrites
+def rename(path, dryrun=False):
+	print(path)
+	for oldname in os.listdir(path):
+		if os.path.isfile(os.path.join(path, oldname)) and eligible(oldname):
+			newname = process(oldname)
+			print(f"{oldname} -> {newname}")
+			if not dryrun:
+				os.rename(os.path.join(path, oldname), os.path.join(path, newname))
+
+dryrun_arg = False
+path_arg = "."
+
+# TODO: multiple arguments at once
+if len(argv) >= 2:
+	if argv[1] == "-d":
+		dryrun_arg = True
+	else:
+		path_arg = os.path.join(path_arg, argv[1])
+
+rename(path_arg, dryrun_arg)
