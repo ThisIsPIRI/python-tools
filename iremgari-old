@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
+# For Python versions before 3.11
+
 import os
 from sys import argv
-import glob
 
 def eligible(name):
 	# EDIT ME
@@ -15,9 +16,9 @@ def process(name):
 	return name
 
 # TODO: guard against overwrites
-def rename(path, recursive=False, dryrun=False):
-	print(f"Iremgari search root: {path}")
-	for oldname in glob.glob("**", root_dir=path, recursive=recursive, include_hidden=True):
+def rename(path, dryrun=False):
+	print(path)
+	for oldname in os.listdir(path):
 		if os.path.isfile(os.path.join(path, oldname)) and eligible(oldname):
 			newname = process(oldname)
 			print(f"{oldname} -> {newname}")
@@ -34,4 +35,4 @@ if len(argv) >= 2:
 	else:
 		path_arg = os.path.join(path_arg, argv[1])
 
-rename(path_arg, False, dryrun_arg)
+rename(path_arg, dryrun_arg)
