@@ -34,8 +34,8 @@ if len(argv) >= 2:
 		for argchar in argv[1][1:]:
 			args[argchar_to_param[argchar]] = True
 		if len(argv) >= 3:
-			args["path"] = os.path.join(".", argv[2])
+			args["path"] = argv[2]
 	else:
-		args["path"] = os.path.join(".", argv[1])
+		args["path"] = argv[1]
 
 rename(**args)
