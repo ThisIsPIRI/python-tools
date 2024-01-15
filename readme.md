@@ -17,8 +17,8 @@ Shows how many photos were taken in each day.
 Illustrates how binary works. Can also be used to generate random black-and-white images.
 
 ## iremgari 이름갈이
-여러 파일의 이름을 한벌에 바꿉니다.
-Bulk rename files in a folder.
+여러 파일을 한벌에 고치고 이름바꿉니다.
+Bulk rename and/or edit files.
 
 ## nurijach 누리자취
 traceroute를 돌려서 나온 IP의 땅위자리(좌표)를 kml에 씁니다.

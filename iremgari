@@ -14,15 +14,34 @@ def process(name):
 	# Return the new name given an old name.
 	return name
 
+def eligible_edit(name):
+	# EDIT ME
+	# Determine whether a file should be edited, given its old name.
+	return False
+
+def process_edit(content):
+	# EDIT ME
+	# Return the new file content given the old content.
+	return content
+
 # TODO: guard against overwrites
 def rename(path=".", recursive=False, dryrun=False):
 	print(f"Iremgari search root: {path}")
 	for oldname in glob.glob("**", root_dir=path, recursive=recursive, include_hidden=True):
-		if os.path.isfile(os.path.join(path, oldname)) and eligible(oldname):
-			newname = process(oldname)
-			print(f"{oldname} -> {newname}")
-			if not dryrun:
-				os.rename(os.path.join(path, oldname), os.path.join(path, newname))
+		if os.path.isfile(os.path.join(path, oldname)):
+			if eligible_edit(oldname):
+				print(f"Editing {oldname}")
+				if not dryrun:
+					with open(os.path.join(path, oldname)) as f:
+						content = f.read()
+					content = process_edit(content)
+					with open(os.path.join(path, oldname), "w") as f:
+						f.write(content)
+			if eligible(oldname):
+				newname = process(oldname)
+				print(f"{oldname} -> {newname}")
+				if not dryrun:
+					os.rename(os.path.join(path, oldname), os.path.join(path, newname))
 
 argchar_to_param = {
 	"d": "dryrun",
