@@ -20,6 +20,21 @@ Illustrates how binary works. Can also be used to generate random black-and-whit
 여러 파일을 한벌에 고치고 이름바꿉니다.
 Bulk rename and/or edit files.
 
+쓰임새 보기(예시):
+
+```python
+def eligible(name):
+	# Example use: move all files in immediate subdirectories to the given root..
+	return name.count('/') == 1
+
+def process(name):
+	# ..prefixing the new filename with the subdirectory name.
+	spl = name.split('/')
+	return spl[0] + '_' + spl[1]
+```
+
+`./iremgari -r /target/dir`
+
 ## nurijach 누리자취
 traceroute를 돌려서 나온 IP의 땅위자리(좌표)를 kml에 씁니다.
 Writes geolocations of IPs from traceroute to kml.

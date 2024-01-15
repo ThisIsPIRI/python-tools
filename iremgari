@@ -4,25 +4,25 @@ import os
 from sys import argv
 import glob
 
+###### EDIT THESE ######
+
 def eligible(name):
-	# EDIT ME
 	# Determine whether a file should be renamed.
 	return False
 
 def process(name):
-	# EDIT ME
 	# Return the new name given an old name.
 	return name
 
 def eligible_edit(name):
-	# EDIT ME
 	# Determine whether a file should be edited, given its old name.
 	return False
 
 def process_edit(content):
-	# EDIT ME
 	# Return the new file content given the old content.
 	return content
+
+######
 
 # TODO: guard against overwrites
 def rename(path=".", recursive=False, dryrun=False):
